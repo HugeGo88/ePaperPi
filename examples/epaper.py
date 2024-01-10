@@ -20,6 +20,7 @@ if os.path.exists(libdir):
 
 font24 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 24)
 font22 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 22)
+font12 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 12)
 fontIcon = ImageFont.truetype(os.path.join(
     picdir, 'materialdesignicons-webfont.ttf'), 22)
 
@@ -59,30 +60,41 @@ class word_press:
         events = word_press.read_wordpress_events()
         tickets = word_press.read_wordpress_tickets()
         line = edge
+
+        for ticket in tickets:
+
+            draw_black.text((edge + epd.width/2, line),
+                            str(ticket['title']['rendered']), font=font22, fill=(0, 0, 0, 255))
+
+            line += lineHeight
+            draw_red.text((edge + epd.width/2, line),
+                          str(ticket['meta']['_stock'])+'/'+str(ticket['meta']['_tribe_ticket_capacity']), font=font22, fill=(255, 0, 0, 255))
+            line += lineHeight + lineGap
+
         for event in events['events']:
             soup = BeautifulSoup(event['title'], 'html.parser')
             startTime = datetime.strptime(
                 event['start_date'], '%Y-%m-%d %H:%M:%S')
-
-            draw_red.text((edge + epd.width/2, line),
-                          startTime.strftime('%A %d %B %Y'), font=font22, fill=(255, 0, 0, 255))
             # icon = chr(0xf207)
             # draw_red.text((edge, line),
             #               icon, font=fontIcon, fill=(255, 0, 0, 255))
-            line += lineHeight
             draw_black.text((edge + epd.width/2, line),
                             soup.text, font=font22, fill=(0, 0, 0, 255))
-            line += lineHeight + lineGap
-        line = edge
-        for ticket in tickets:
 
-            draw_black.text((edge, line),
-                            str(ticket['title']['rendered']), font=font22, fill=(0, 0, 0, 255))
+            draw_red.text((edge + epd.width/2 - space, line),
+                          startTime.strftime('%d'), font=font24, fill=(255, 0, 0, 255))
 
             line += lineHeight
-            draw_red.text((edge, line),
-                          str(ticket['meta']['_stock'])+'/'+str(ticket['meta']['_tribe_ticket_capacity']), font=font22, fill=(255, 0, 0, 255))
+
+            draw_red.text((edge + epd.width/2 - space, line),
+                          startTime.strftime('%b'), font=font24, fill=(255, 0, 0, 255))
+
+            draw_red.text((edge + epd.width/2, line),
+                          startTime.strftime('%H:%M')+' Uhr - '+event['venue']['venue'], font=font22, fill=(255, 0, 0, 255))
             line += lineHeight + lineGap
+
+        draw_black.text((edge, epd.height - edge - lineHeight/2),
+                        'Letztes Update ' + datetime.now().strftime('%d.%m.%Y %H:%M'), font=font12, fill=(0, 0, 0, 255))
 
         combined = Image.alpha_composite(combined, black)
         combined = Image.alpha_composite(combined, red)
