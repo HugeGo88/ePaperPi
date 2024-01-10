@@ -1,13 +1,17 @@
-from PIL import Image, ImageDraw, ImageFont
-import traceback
-import time
-import logging
-import sys
-import os
-import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
+from deck.api import NextCloudDeckAPI
+from deck.models import Board, Card, Stack
+from PIL import Image, ImageDraw, ImageFont
+from requests.auth import HTTPBasicAuth
 import locale
+import logging
+import os
+import requests
+import sys
+import time
+import traceback
+from credentials import credentials
 
 locale.setlocale(locale.LC_TIME, 'de_DE')
 
@@ -23,6 +27,23 @@ font22 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 22)
 font12 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 12)
 fontIcon = ImageFont.truetype(os.path.join(
     picdir, 'materialdesignicons-webfont.ttf'), 22)
+
+
+nc = NextCloudDeckAPI(
+    "https://nextcloud.cvjm-walheim.de:443", HTTPBasicAuth(credentials.user, credentials.password), ssl_verify=True
+)
+
+boards = nc.get_boards()
+
+for board in boards:
+    print(board.title)
+    stacks = nc.get_stacks(board.id)
+    for stack in stacks:
+        if (stack.title != "Offen"):
+            continue
+        print(stack.title)
+        for card in stack.cards:
+            print(card.title)
 
 
 class word_press:
