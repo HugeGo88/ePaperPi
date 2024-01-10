@@ -32,22 +32,33 @@ nc = NextCloudDeckAPI(
 )
 
 
+class Task:
+    def __init__(self, card, stack, board):
+        self.card = card
+        self.stack = stack
+        self.board = board
+
+    card = Card
+    stack = Stack
+    board = Board
+
+
 class word_press:
     def read_cards():
-        all_cards = []
+        all_tasks = []
         boards = nc.get_boards()
 
         for board in boards:
             print(board.title)
             stacks = nc.get_stacks(board.id)
             for stack in stacks:
-                if (stack.title != "Offen"):
+                if (stack.title == "Erledigt"):
                     continue
                 print(stack.title)
                 for card in stack.cards:
-                    all_cards.append(card)
+                    all_tasks.append(Task(card=card, stack=stack, board=board))
                     print(card.title)
-        return all_cards
+        return all_tasks
 
     def read_wordpress_events():
         api_url = 'https://cvjm-walheim.de/wp-json/tribe/events/v1/events?_embed&page=1'
@@ -118,13 +129,13 @@ class word_press:
 
         cards = word_press.read_cards()
         line = edge
-        for card in cards:
+        for task in cards:
             duedate = ""
-            if (card.duedate != None):
+            if (task.card.duedate != None):
                 duedate = datetime.strptime(
-                    card.duedate, '%Y-%m-%dT%H:%M:%S+00:00')
+                    task.card.duedate, '%Y-%m-%dT%H:%M:%S+00:00')
             draw_black.text((edge, line),
-                            str(card.title), font=font22, fill=(0, 0, 0, 255))
+                            str(task.card.title) + " (" + task.stack.title + ")", font=font22, fill=(0, 0, 0, 255))
 
             line += lineHeight
 
