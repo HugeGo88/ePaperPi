@@ -9,8 +9,6 @@ import logging
 import os
 import requests
 import sys
-import time
-import traceback
 from credentials import credentials
 
 locale.setlocale(locale.LC_TIME, 'de_DE')
@@ -22,7 +20,7 @@ libdir = os.path.join(os.path.dirname(
 if os.path.exists(libdir):
     sys.path.append(libdir)
 
-font24 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 24)
+font26 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 26)
 font22 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 22)
 font12 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 12)
 fontIcon = ImageFont.truetype(os.path.join(
@@ -33,20 +31,24 @@ nc = NextCloudDeckAPI(
     "https://nextcloud.cvjm-walheim.de:443", HTTPBasicAuth(credentials.user, credentials.password), ssl_verify=True
 )
 
-boards = nc.get_boards()
-
-for board in boards:
-    print(board.title)
-    stacks = nc.get_stacks(board.id)
-    for stack in stacks:
-        if (stack.title != "Offen"):
-            continue
-        print(stack.title)
-        for card in stack.cards:
-            print(card.title)
-
 
 class word_press:
+    def read_cards():
+        all_cards = []
+        boards = nc.get_boards()
+
+        for board in boards:
+            print(board.title)
+            stacks = nc.get_stacks(board.id)
+            for stack in stacks:
+                if (stack.title != "Offen"):
+                    continue
+                print(stack.title)
+                for card in stack.cards:
+                    all_cards.append(card)
+                    print(card.title)
+        return all_cards
+
     def read_wordpress_events():
         api_url = 'https://cvjm-walheim.de/wp-json/tribe/events/v1/events?_embed&page=1'
         response = requests.get(api_url)
@@ -103,15 +105,33 @@ class word_press:
                             soup.text, font=font22, fill=(0, 0, 0, 255))
 
             draw_red.text((edge + epd.width/2 - space, line),
-                          startTime.strftime('%d'), font=font24, fill=(255, 0, 0, 255))
+                          startTime.strftime('%d'), font=font26, fill=(255, 0, 0, 255))
 
             line += lineHeight
 
             draw_red.text((edge + epd.width/2 - space, line),
-                          startTime.strftime('%b'), font=font24, fill=(255, 0, 0, 255))
+                          startTime.strftime('%b'), font=font26, fill=(255, 0, 0, 255))
 
             draw_red.text((edge + epd.width/2, line),
                           startTime.strftime('%H:%M')+' Uhr - '+event['venue']['venue'], font=font22, fill=(255, 0, 0, 255))
+            line += lineHeight + lineGap
+
+        cards = word_press.read_cards()
+        line = edge
+        for card in cards:
+            duedate = ""
+            if (card.duedate != None):
+                duedate = datetime.strptime(
+                    card.duedate, '%Y-%m-%dT%H:%M:%S+00:00')
+            draw_black.text((edge, line),
+                            str(card.title), font=font22, fill=(0, 0, 0, 255))
+
+            line += lineHeight
+
+            if (duedate != ''):
+                draw_red.text((edge, line),
+                              duedate.strftime('%d.%m'), font=font22, fill=(255, 0, 0, 255))
+
             line += lineHeight + lineGap
 
         draw_black.text((edge, epd.height - edge - lineHeight/2),
