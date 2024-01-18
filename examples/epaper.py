@@ -20,9 +20,9 @@ libdir = os.path.join(os.path.dirname(
 if os.path.exists(libdir):
     sys.path.append(libdir)
 
-font26 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 26)
-font22 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 22)
-font12 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 12)
+largeText = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 22)
+mediumText = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 16)
+smallText = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 12)
 fontIcon = ImageFont.truetype(os.path.join(
     picdir, 'materialdesignicons-webfont.ttf'), 22)
 
@@ -49,15 +49,15 @@ class word_press:
         boards = nc.get_boards()
 
         for board in boards:
-            print(board.title)
+            logging.info(board.title)
             stacks = nc.get_stacks(board.id)
             for stack in stacks:
                 if (stack.title == "Erledigt"):
                     continue
-                print(stack.title)
+                logging.info(stack.title)
                 for card in stack.cards:
                     all_tasks.append(Task(card=card, stack=stack, board=board))
-                    print(card.title)
+                    logging.info(card.title)
         return all_tasks
 
     def read_wordpress_events():
@@ -77,8 +77,8 @@ class word_press:
     def create_images():
         edge = 10
         space = 50
-        lineHeight = 27
-        lineGap = 15
+        lineHeight = 22
+        lineGap = 10
         logging.info("ePaper Example")
         # Clean image
         logging.info("Get data from wordpress")
@@ -98,11 +98,11 @@ class word_press:
         for ticket in tickets:
 
             draw_black.text((edge + epd.width/2, line),
-                            str(ticket['title']['rendered']), font=font22, fill=(0, 0, 0, 255))
+                            str(ticket['title']['rendered']), font=mediumText, fill=(0, 0, 0, 255))
 
             line += lineHeight
             draw_red.text((edge + epd.width/2, line),
-                          str(ticket['meta']['_stock'])+'/'+str(ticket['meta']['_tribe_ticket_capacity']), font=font22, fill=(255, 0, 0, 255))
+                          str(ticket['meta']['_stock'])+'/'+str(ticket['meta']['_tribe_ticket_capacity'] + " übrig"), font=mediumText, fill=(255, 0, 0, 255))
             line += lineHeight + lineGap
 
         for event in events['events']:
@@ -113,40 +113,40 @@ class word_press:
             # draw_red.text((edge, line),
             #               icon, font=fontIcon, fill=(255, 0, 0, 255))
             draw_black.text((edge + epd.width/2, line),
-                            soup.text, font=font22, fill=(0, 0, 0, 255))
+                            soup.text, font=mediumText, fill=(0, 0, 0, 255))
 
             draw_red.text((edge + epd.width/2 - space, line),
-                          startTime.strftime('%d'), font=font26, fill=(255, 0, 0, 255))
+                          startTime.strftime('%d'), font=largeText, fill=(255, 0, 0, 255))
 
             line += lineHeight
 
             draw_red.text((edge + epd.width/2 - space, line),
-                          startTime.strftime('%b'), font=font26, fill=(255, 0, 0, 255))
+                          startTime.strftime('%b'), font=largeText, fill=(255, 0, 0, 255))
 
             draw_red.text((edge + epd.width/2, line),
-                          startTime.strftime('%H:%M')+' Uhr - '+event['venue']['venue'], font=font22, fill=(255, 0, 0, 255))
+                          startTime.strftime('%H:%M')+' Uhr - '+event['venue']['venue'], font=mediumText, fill=(255, 0, 0, 255))
             line += lineHeight + lineGap
 
         cards = word_press.read_cards()
         line = edge
-        for task in cards:
+        for card in cards:
             duedate = ""
-            if (task.card.duedate != None):
+            if (card.card.duedate != None):
                 duedate = datetime.strptime(
-                    task.card.duedate, '%Y-%m-%dT%H:%M:%S+00:00')
+                    card.card.duedate, '%Y-%m-%dT%H:%M:%S+00:00')
             draw_black.text((edge, line),
-                            str(task.card.title) + " (" + task.stack.title + ")", font=font22, fill=(0, 0, 0, 255))
+                            str(card.card.title), font=mediumText, fill=(0, 0, 0, 255))
 
             line += lineHeight
 
             if (duedate != ''):
                 draw_red.text((edge, line),
-                              duedate.strftime('%d.%m'), font=font22, fill=(255, 0, 0, 255))
+                              duedate.strftime('%d.%m') + " (" + card.stack.title + " " + card.board.title + ")", font=mediumText, fill=(255, 0, 0, 255))
 
             line += lineHeight + lineGap
 
         draw_black.text((edge, epd.height - edge - lineHeight/2),
-                        'Letztes Update ' + datetime.now().strftime('%d.%m.%Y %H:%M'), font=font12, fill=(0, 0, 0, 255))
+                        'Letztes Update ' + datetime.now().strftime('%d.%m.%Y %H:%M'), font=smallText, fill=(0, 0, 0, 255))
 
         combined = Image.alpha_composite(combined, black)
         combined = Image.alpha_composite(combined, red)
