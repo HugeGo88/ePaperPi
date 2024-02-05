@@ -17,7 +17,7 @@ class Epaper_screen:
         self.top_space = 0
         self.left_space = 0
         self.right_space = 0
-        self.line_heigt = 10
+        self.line_heigt = 25
         self.line_gap = 10
 
         self.width = 800
@@ -31,7 +31,7 @@ class Epaper_screen:
         self.largeText = ImageFont.truetype(
             os.path.join(picdir, 'Font.ttc'), 22)
         self.mediumText = ImageFont.truetype(
-            os.path.join(picdir, 'Font.ttc'), 16)
+            os.path.join(picdir, 'Font.ttc'), 18)
         self.smallText = ImageFont.truetype(
             os.path.join(picdir, 'Font.ttc'), 12)
 
