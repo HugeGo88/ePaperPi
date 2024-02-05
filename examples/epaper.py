@@ -10,6 +10,7 @@ import os
 import requests
 import sys
 from credentials import credentials
+from write_epaper import Epaper_screen
 
 locale.setlocale(locale.LC_TIME, 'de_DE')
 
@@ -170,7 +171,11 @@ try:
     # black.save('images/black.png')
     # red.save('images/red.png')
     # combined.save('images/combined.png')
-    print('Test')
+    epaper = Epaper_screen()
+    epaper.write(text='Test', font=largeText, x=10, y=10, color='red')
+    epaper.write(text='Test', font=mediumText, x=200, y=10, color='black')
+    epaper.print_images()
+
 
 except IOError as e:
     logging.error(e)
