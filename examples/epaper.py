@@ -87,6 +87,10 @@ class word_press:
         red = Image.new('RGBA', (epd.width, epd.height), (255, 255, 255, 0))
         combined = Image.new(
             'RGBA', (epd.width, epd.height), (255, 255, 255, 255))
+        combined_red = Image.new(
+            'RGBA', (epd.width, epd.height), (255, 255, 255, 255))
+        combined_black = Image.new(
+            'RGBA', (epd.width, epd.height), (255, 255, 255, 255))
 
         draw_black = ImageDraw.Draw(black)
         draw_red = ImageDraw.Draw(red)
@@ -109,9 +113,7 @@ class word_press:
             soup = BeautifulSoup(event['title'], 'html.parser')
             startTime = datetime.strptime(
                 event['start_date'], '%Y-%m-%d %H:%M:%S')
-            # icon = chr(0xf207)
-            # draw_red.text((edge, line),
-            #               icon, font=fontIcon, fill=(255, 0, 0, 255))
+
             draw_black.text((edge + epd.width/2, line),
                             soup.text, font=mediumText, fill=(0, 0, 0, 255))
 
@@ -150,7 +152,9 @@ class word_press:
 
         combined = Image.alpha_composite(combined, black)
         combined = Image.alpha_composite(combined, red)
-        return black, red, combined
+        combined_red = Image.alpha_composite(combined_red, red)
+        combined_black = Image.alpha_composite(combined_black, black)
+        return combined_black, combined_red, combined
 
 
 class epd:
@@ -162,19 +166,11 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 try:
-    black, red, combined = word_press.create_images()
-    black.save('images/black.png')
-    red.save('images/red.png')
-    combined.save('images/combined.png')
-    # txt = Image.new('RGBA', (epd.width, epd.height), (255, 255, 255, 0))
-
-    # font22 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 22)
-    # d = ImageDraw.Draw(txt)
-
-    # d.text((0, 0), "This text should be 5% alpha",
-    #        fill=(255, 0, 0, 255), font=font22)
-    # combined = Image.alpha_composite(red, txt)
-    # combined.save('combined.png')
+    # black, red, combined = word_press.create_images()
+    # black.save('images/black.png')
+    # red.save('images/red.png')
+    # combined.save('images/combined.png')
+    print('Test')
 
 except IOError as e:
-    logging.info(e)
+    logging.error(e)
