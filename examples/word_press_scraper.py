@@ -16,12 +16,12 @@ class word_press_scraper:
         response_json = response.json()
         return response_json
 
-    def read_wordpress_tickets(self):
-        logger.info("Get tickets")
-        api_url = self.url + '/wp-json/wp/v2/tribe_rsvp_tickets?page=1'
-        response = requests.get(api_url)
-        response_json = response.json()
-        return response_json
+    # def read_wordpress_tickets(self):
+    #     logger.info("Get tickets")
+    #     api_url = self.url + '/wp-json/wp/v2/tribe_rsvp_tickets?page=1'
+    #     response = requests.get(api_url)
+    #     response_json = response.json()
+    #     return response_json
 
     # def create_images():
     #     edge = 10

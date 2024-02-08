@@ -14,11 +14,11 @@ class Epaper_screen:
         logger.info('Create write_paper class')
 
         self.bottom_space = 0
-        self.top_space = 0
+        self.top_space = 20
         self.left_space = 0
         self.right_space = 0
-        self.line_heigt = 25
-        self.line_gap = 10
+        self.line_heigt = 20
+        self.line_gap = 15
 
         self.width = 800
         self.height = 480
