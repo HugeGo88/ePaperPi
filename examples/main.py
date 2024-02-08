@@ -183,7 +183,6 @@ def print_events(epaper, x):
         epaper.write(text=startTime.strftime('%b'),
                      font=largeText, x=370, y=y-5, color='red')
         y += epaper.line_heigt
-        y += epaper.line_gap
 
 
 logging.basicConfig(level=logging.DEBUG)
