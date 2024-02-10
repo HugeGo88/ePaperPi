@@ -163,26 +163,35 @@ fontIcon = ImageFont.truetype(os.path.join(
 #     width = 800
 #     height = 480
 
+def print_update_time(epaper, x, y):
+    epaper.write(text='Letztes Update ' + datetime.now().strftime('%d.%m.%Y %H:%M'),
+                 x=x, y=y, font=smallText, color='black')
+
 
 def print_events(epaper, x):
     wp = word_press_scraper(url='https://cvjm-walheim.de')
     events = wp.read_wordpress_events()
     y = epaper.top_space
+    i = 0
     for event in events['events']:
+        if (i > 7):
+            break
         title = BeautifulSoup(event['title'], 'html.parser')
         startTime = datetime.strptime(
             event['start_date'], '%Y-%m-%d %H:%M:%S')
         logging.info(title.text)
         epaper.write(text=title.text, font=mediumText,
-                     x=x, y=y, color='black')
+                     x=x+50, y=y, color='black')
         epaper.write(text=startTime.strftime('%d'),
-                     font=largeText, x=370, y=y-5, color='red')
+                     font=largeText, x=x, y=y-5, color='red')
         y += epaper.line_heigt
         epaper.write(text=startTime.strftime('%H:%M')+' Uhr - '+event['venue']['venue'], font=mediumText,
-                     x=x, y=y, color='red')
+                     x=x+50, y=y, color='red')
         epaper.write(text=startTime.strftime('%b'),
-                     font=largeText, x=370, y=y-5, color='red')
+                     font=largeText, x=x, y=y-5, color='red')
         y += epaper.line_heigt
+        y += epaper.line_gap
+        i += 1
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -196,10 +205,10 @@ try:
 
     epaper = Epaper_screen()
 
-    print_events(epaper, 420)
+    print_events(epaper, epaper.width/2)
+    print_update_time(epaper, epaper.left_space, epaper.height-epaper.line_heigt -
+                      epaper.line_gap)
 
-    # epaper.write(text='Test', font=largeText, x=10, y=10, color='red')
-    # epaper.write(text='Test', font=mediumText, x=200, y=10, color='black')
     epaper.print_images()
 
 
