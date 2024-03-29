@@ -185,8 +185,12 @@ def print_events(epaper, x):
         epaper.write(text=startTime.strftime('%d'),
                      font=largeText, x=x, y=y-5, color='red')
         y += epaper.line_heigt
-        epaper.write(text=startTime.strftime('%H:%M')+' Uhr - '+event['venue']['venue'], font=mediumText,
-                     x=x+50, y=y, color='red')
+        try:
+            epaper.write(text=startTime.strftime('%H:%M')+' Uhr - '+event['venue']['venue'], font=mediumText,
+                         x=x+50, y=y, color='red')
+        except:
+            epaper.write(text=startTime.strftime('%H:%M')+' Uhr', font=mediumText,
+                         x=x+50, y=y, color='red')
         epaper.write(text=startTime.strftime('%b'),
                      font=largeText, x=x, y=y-5, color='red')
         y += epaper.line_heigt
