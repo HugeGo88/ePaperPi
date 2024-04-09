@@ -104,3 +104,8 @@ class word_press_scraper:
     #     combined_red = Image.alpha_composite(combined_red, red)
     #     combined_black = Image.alpha_composite(combined_black, black)
     #     return combined_black, combined_red, combined
+
+
+if __name__ == '__main__':
+    wp = word_press_scraper(url='https://cvjm-walheim.de')
+    wp.read_wordpress_events()
